@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="bootstrap/css/bootstrap.css" />
         <link href="bootstrap/css/select2.min.css" rel="stylesheet" />
         <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mask.js"></script>
         <script type="text/javascript" src="js/funcoes.js"></script>
         <script type="text/javascript" src="bootstrap/js/bootstrap.js" ></script>
         <script type="text/javascript" src="bootstrap/js/npm.js"></script>
@@ -28,7 +29,7 @@
     <body>
          
         <div class="container-fluid">
-            <div class="col-md-4 col-md-offset-4">
+            <div class="col-md-12">
                 <div class="row">
                     
                     <center>
@@ -39,7 +40,7 @@
                             <header> 
                                 <tr> 
                                     <th style="float: right">
-                                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#modalIncluir"  onclick="clienteIncluir()"> Novo Cliente </button> 
+                                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#modalEditar"  onclick="clienteIncluir()"> Novo Cliente </button> 
                                     </th> 
                                 </tr> 
                             </header>
@@ -64,9 +65,10 @@
                 <h3 class="modal-title" id="editarModalLabel">Editar Cliente</h3>
             </div>
             <div class="modal-body">
-                <form class="table-form">
+                <form method="post" enctype="multipart/form-data">
                     <table class="">
                         <input type="hidden" id="idCliente" name="idCliente"> </td>
+                        <input type="hidden" id="acao" name="acao"> </td>
                         <tr>
                             <td style="width: 80px">Nome</td>
                             <td><input type="text" class="form-control" id="nmCliente" name="nmCliente" style="width: 100%"> </td>
@@ -74,12 +76,12 @@
                         <tr> <td colspan="2">&nbsp;</td> </tr>
                         <tr>
                             <td style="width: 80px">Email</td>
-                            <td><input type="text" class="form-control" id="emailCliente" name="emailCliente" style="width: 100%"> </td>
+                            <td><input type="text" class="form-control" id="emailCliente" name="emailCliente" onblur="checarEmail();" style="width: 100%"> </td>
                         </tr>
                         <tr> <td colspan="2">&nbsp;</td> </tr>
                         <tr>
                             <td style="width: 80px">Telefone</td>
-                            <td><input type="text" class="form-control" id="foneCliente" name="foneCliente" style="width: 40%"> </td>
+                            <td><input type="text" class="form-control" id="foneCliente" name="foneCliente" maxlength="14" pattern="\([0-9]{2}\)[\s][0-9]{4}-[0-9]{4,5}" style="width: 50%"> </td>
                         </tr>
                         <tr> <td colspan="2">&nbsp;</td> </tr>
                         <tr>
@@ -97,50 +99,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                 <button type="button" class="btn btn-primary"   data-dismiss="modal" onclick="clienteSalvar();">Salvar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalIncluir" role="dialog" aria-labelledby="incluirModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="incluirModalLabel">Incluir Cliente</h3>
-            </div>
-            <div class="modal-body">
-                <form class="table-form">
-                    <table class="">
-                        <tr>
-                            <td style="width: 80px">Nome</td>
-                            <td><input type="text" class="form-control" id="nmClienten" name="nmClienten" style="width: 250px"> </td>
-                        </tr>
-                        <tr> <td colspan="2">&nbsp;</td> </tr>
-                        <tr>
-                            <td style="width: 80px">Email</td>
-                            <td><input type="text" class="form-control" id="emailClienten" name="emailClienten" style="width: 250px"> </td>
-                        </tr>
-                        <tr> <td colspan="2">&nbsp;</td> </tr>
-                        <tr>
-                            <td style="width: 80px">Telefone</td>
-                            <td><input type="text" class="form-control" id="foneClienten" name="foneClienten" style="width: 150px"> </td>
-                        </tr>
-                        <tr> <td colspan="2">&nbsp;</td> </tr>
-                        <tr>
-                            <td style="width: 80px">Foto</td>
-                            <td><img name="clienteImagemn" id="clienteImagemn" class="img-circle" src="" width="150px" height="150px"></td>
-                        </tr>
-                        <tr> <td colspan="2">&nbsp;</td> </tr>
-                        <tr>
-                            <td style="width: 80px">Arquivo</td>
-                            <td> <input type="file" class="form-control" id="fotoClienten" name="fotoClienten"  style="width: 100%"> </td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary"   data-dismiss="modal" onclick="clienteIncluirConfirma();">Salvar</button>
             </div>
         </div>
     </div>
@@ -183,8 +141,19 @@
 
 <script type="text/javascript">
 
+    $("#foneCliente").mask("(00) 00000-0009");
+    
+    function checarEmail(){
+        if( document.forms[0].emailCliente.value=="" 
+            || document.forms[0].emailCliente.value.indexOf('@')==-1 
+            || document.forms[0].emailCliente.value.indexOf('.')==-1 )
+            {
+              mostraDialogo( "E-MAIL", "Por favor, informe um E-MAIL válido!"  , "warning", );
+              $("#page-data").focus();
+            }
+    }    
+    
     function listar() {
-
         $.ajax({
             url: "./ajax/clientes_lista.php",
             type: "POST",
@@ -200,74 +169,137 @@
             url: "./ajax/clientes_crud.php",
             type: "POST",
             dataType: "json",
-            data: { forma: 1, id: idRef },
+            data: { acao: 1, id: idRef },
             success: function (res) {
+                $("#acao").val("2");
                 $("#idCliente").val(res.Id);
                 $("#nmCliente").val(res.nome);
                 $("#emailCliente").val(res.email);
                 $("#foneCliente").val(res.telefone);
-                //$('#clienteImagem').attr('src', 'fotos/' + res.foto);
+                $('#clienteImagem').attr('src', 'fotos/' + res.foto);
+                $('#fotoCliente').val('');
            }
         });
+    }
+    
+    var nmArqFoto;
+    var formEditar;
+    function readURL(input) {
+       if(input.files.length > 4) { }
+       
+           if (input.files && input.files[0]) {
+               var reader = new FileReader();
+
+               reader.onload = function (e) {
+                   $('#clienteImagem').attr('src', e.target.result);
+               }
+
+               reader.readAsDataURL(input.files[0]);
+           }
+    }
+
+    $('#fotoCliente').change(function (event) {
+        readURL(this);
+        formEditar = new FormData();
+        formEditar.append('fotoCliente', event.target.files[0]); // para apenas 1 arquivo
+        //var name = event.target.files[0].content.name; // para capturar o nome do arquivo com sua extenção
+    });
+
+    function clienteSalvar( ) {
+        nmArqFoto = "";
+        if ( $('#fotoCliente').val() != null && $('#fotoCliente').val() !== '' ){
+            
+            if ( $("#acao").val() === '2' ){
+                $.ajax({
+                    url: "./ajax/clientes_crud.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: { acao: 5, id: $("#idCliente").val() },
+                    success: function (res) {
+                        if ( res.status == true ){
+                            //mostraDialogo( "Foto", "Excluida com sucesso!" , "info", );
+                        } else {
+                            //mostraDialogo( "Foto", res.erro  , "danger", );
+                        }
+                   }
+                });
+                
+            }
+            
+            $.ajax({
+                url: "./ajax/clientes_fotos.php",
+                type: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                data: formEditar,
+                success: function (res) {
+                    nmArqFoto = res.nameFile;
+                    $.ajax({
+                        url: "./ajax/clientes_crud.php",
+                        type: "POST",
+                        dataType: "json",
+                        data: { 
+                            acao: $("#acao").val(),
+                            id: $("#idCliente").val(),
+                            nome: $("#nmCliente").val(),
+                            email: $("#emailCliente").val(),
+                            telefone: $("#foneCliente").val(),
+                            foto: nmArqFoto,
+                        },
+                        success: function (res) {
+                            if ( res.status == true ){
+                                mostraDialogo( "Cliente", "Salvo com sucesso!" , "info", );
+                                listar();
+                            } else {
+                                mostraDialogo( "Cliente", res.erro  , "danger", );
+                            }
+                       }
+                    });
+                }
+            });
+        } else {
+
+            $.ajax({
+                url: "./ajax/clientes_crud.php",
+                type: "POST",
+                dataType: "json",
+                data: { 
+                    acao: $("#acao").val(),
+                    id: $("#idCliente").val(),
+                    nome: $("#nmCliente").val(),
+                    email: $("#emailCliente").val(),
+                    telefone: $("#foneCliente").val(),
+                    foto: nmArqFoto,
+                },
+                success: function (res) {
+                    if ( res.status == true ){
+                        mostraDialogo( "Cliente", "Salvo com sucesso!" , "info", );
+                        listar();
+                    } else {
+                        mostraDialogo( "Cliente", res.erro  , "danger", );
+                    }
+               }
+            });
+        }
     }
     
     function clienteIncluir() {
-        $("#nmClienten").val("");
-        $("#emailClienten").val("");
-        $("#foneClienten").val("");
-        $("#fotoClienten").val("");
+        $("#acao").val("3");
+        $("#idCliente").val("");
+        $("#nmCliente").val("");
+        $("#emailCliente").val("");
+        $("#foneCliente").val("");
+        $('#clienteImagem').attr("src", "");
+        $('#fotoCliente').val("");
     }
     
-    function clienteIncluirConfirma( ) {
-        $.ajax({
-            url: "./ajax/clientes_crud.php",
-            type: "POST",
-            dataType: "json",
-            data: { 
-                forma: 3, 
-                id: "",
-                nome: $("#nmClienten").val(),
-                email: $("#emailClienten").val(),
-                telefone: $("#foneClienten").val(),
-                foto: $("#fotoClienten").val()
-            },
-            success: function (res) {
-                mostraDialogo( "Cliente", "Incluido com sucesso!", "success", );
-                listar();
-           }
-        });
-    }
-
-    function clienteSalvar( ) {
-        $.ajax({
-            url: "./ajax/clientes_crud.php",
-            type: "POST",
-            dataType: "json",
-            data: { 
-                forma: 2, 
-                id: $("#idCliente").val(),
-                nome: $("#nmCliente").val(),
-                email: $("#emailCliente").val(),
-                telefone: $("#foneCliente").val(),
-                foto: $("#fotoCliente").val()
-            },
-            success: function (res) {
-                if ( res.status == true ){
-                    mostraDialogo( "Cliente", "Salvo com sucesso!", "info", );
-                    listar();
-                } else {
-                    mostraDialogo( "Cliente", res.erro  , "danger", );
-                }
-           }
-        });
-    }
-
     function clienteExcluir( idRef ) {
         $.ajax({
             url: "./ajax/clientes_crud.php",
             type: "POST",
             dataType: "json",
-            data: { forma: 1, id: idRef },
+            data: { acao: 1, id: idRef },
             success: function (res) {
                 $("#idClientex").val(res.Id);
                 $("#nmClientex").val(res.nome);
@@ -282,50 +314,13 @@
             url: "./ajax/clientes_crud.php",
             type: "POST",
             dataType: "json",
-            data: { forma: 4, id: idRef },
+            data: { acao: 4, id: idRef },
             success: function (res) {
                 mostraDialogo( "Cliente", "Excluido com sucesso!", "danger", );
                 listar();
            }
         });
     }
-    
-    function readURL(input) {
-       if(input.files.length > 4) { }
-       
-           if (input.files && input.files[0]) {
-               var reader = new FileReader();
-
-               reader.onload = function (e) {
-                   $('#clienteImagem').attr('src', e.target.result);
-               }
-
-               reader.readAsDataURL(input.files[0]);
-           }
-    }
-    
-    $("#fotoCliente").change(function(){
-        readURL(this);
-    });
-    
-    function readURLn(input) {
-       if(input.files.length > 4) { }
-       
-           if (input.files && input.files[0]) {
-               var reader = new FileReader();
-
-               reader.onload = function (e) {
-                   $('#clienteImagemn').attr('src', e.target.result);
-               }
-
-               reader.readAsDataURL(input.files[0]);
-           }
-    }
-    
-    $("#fotoClienten").change(function(){
-        readURLn(this);
-    });
-    
     
     listar();
 

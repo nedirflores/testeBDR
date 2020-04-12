@@ -32,7 +32,7 @@
         for ( $x = 0; $x < count($clientes); $x++ ){
             $cliente = $clientes[$x];
             $res->html .= "<tr>";
-            $res->html .= "     <td style='text-align: center'><img class='img-circle'  height='30px' width='30px'  src='".$cliente['foto']."' /></td>";  
+            $res->html .= "     <td style='text-align: center'><img class='img-circle'  height='30px' width='30px'  src='fotos/".$cliente['foto']."' /></td>";  
             //$res->html .= "     <td style='text-align: center'>" . $cliente["id"]       . "</td>";  
             $res->html .= "     <td style='text-align: left'>"   . $cliente["nome"]     . "</td>";  
             $res->html .= "     <td style='text-align: left'>"   . $cliente["email"]    . "</td>";  
